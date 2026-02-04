@@ -4,6 +4,7 @@
   <meta charset="UTF-8" />
   <title>Vu Kieu Phuong | Terminal Portfolio</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+
   <style>
     body {
       margin: 0;
@@ -11,39 +12,67 @@
       background: #0d1117;
       color: #c9d1d9;
     }
+
     .terminal {
       max-width: 900px;
       margin: 40px auto;
       padding: 20px;
+      box-sizing: border-box;
     }
+
+    .line {
+      display: flex;
+      align-items: center;
+    }
+
     .prompt {
       color: #58a6ff;
+      margin-right: 6px;
     }
+
     .output {
       margin: 6px 0 16px;
       white-space: pre-line;
     }
+
     input {
       background: transparent;
       border: none;
+      outline: none;
       color: #c9d1d9;
       font-family: inherit;
       font-size: 16px;
-      outline: none;
-      width: 90%;
+      width: 100%;
     }
+
+    .cursor {
+      display: inline-block;
+      width: 10px;
+      height: 18px;
+      background: #c9d1d9;
+      margin-left: 2px;
+      animation: blink 1s infinite;
+    }
+
+    @keyframes blink {
+      50% { opacity: 0; }
+    }
+
     .light {
       background: #f6f8fa;
       color: #24292f;
     }
+
     .light .prompt {
       color: #0969da;
     }
+
     .light input {
       color: #24292f;
     }
   </style>
 </head>
+
 <body>
   <div class="terminal" id="terminal">
     <div class="output">
@@ -52,9 +81,10 @@ Welcome to Vũ Kiều Phương's portfolio
 Type 'help' to see available commands
     </div>
 
-    <div class="input-line">
+    <div class="line">
       <span class="prompt">$</span>
       <input type="text" id="commandInput" autofocus />
+      <span class="cursor"></span>
     </div>
   </div>
 
@@ -74,6 +104,7 @@ Available commands:
 - clear      : Clear terminal
 - theme      : Toggle light/dark mode
       `,
+
       about: `
 Name         : Vu Kieu Phuong (Lucci)
 Year of birth: 2002
@@ -86,6 +117,7 @@ Background:
 Current role:
 - Junior Project Manager at an engineering company
       `,
+
       experience: `
 - Junior Project Manager
   Yamaguchi Vietnam JSC
@@ -93,17 +125,20 @@ Current role:
 - Business Development Intern
   FPT IS
       `,
+
       skills: `
 - Customer Insight
 - Research Skills
 - Analytical Skills
 - Project Management
       `,
+
       certs: `
 - Google Data Analytics (2024)
 - Business Analyst Foundation (2023)
 - IELTS 6.5 (2021)
       `,
+
       contact: `
 Email   : vukieuphuong98@gmail.com
 Phone   : 0818 880 768
@@ -117,15 +152,16 @@ Facebook: https://facebook.com/kieuphuong.vu.9802
     input.addEventListener("keydown", function (e) {
       if (e.key === "Enter") {
         const cmd = input.value.trim().toLowerCase();
-        if (!cmd) return;
 
-        const commandBlock = document.createElement("div");
-        commandBlock.innerHTML = `
-          <div>
-            <span class="prompt">$</span> ${cmd}
+        const commandLine = document.createElement("div");
+        commandLine.innerHTML = `
+          <div class="line">
+            <span class="prompt">$</span>
+            <span>${cmd}</span>
           </div>
         `;
-        terminal.insertBefore(commandBlock, input.parentElement);
+
+        terminal.insertBefore(commandLine, input.parentElement);
 
         if (cmd === "clear") {
           terminal.innerHTML = `
@@ -134,9 +170,10 @@ Welcome to Vũ Kiều Phương's portfolio
 
 Type 'help' to see available commands
             </div>
-            <div class="input-line">
+            <div class="line">
               <span class="prompt">$</span>
               <input type="text" id="commandInput" autofocus />
+              <span class="cursor"></span>
             </div>
           `;
           location.reload();
@@ -146,17 +183,13 @@ Type 'help' to see available commands
         if (cmd === "theme") {
           isLight = !isLight;
           document.body.classList.toggle("light");
-          input.value = "";
-          return;
+        } else {
+          const output = commands[cmd] || "Command not found. Type 'help'.";
+          const outputDiv = document.createElement("div");
+          outputDiv.className = "output";
+          outputDiv.textContent = output;
+          terminal.insertBefore(outputDiv, input.parentElement);
         }
-
-        const output = commands[cmd] || "Command not found. Type 'help'.";
-
-        const outputBlock = document.createElement("div");
-        outputBlock.className = "output";
-        outputBlock.textContent = output;
-
-        terminal.insertBefore(outputBlock, input.parentElement);
 
         input.value = "";
         window.scrollTo(0, document.body.scrollHeight);
