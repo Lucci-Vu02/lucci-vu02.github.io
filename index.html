@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -20,21 +19,18 @@
     .prompt {
       color: #58a6ff;
     }
-    .command {
-      color: #c9d1d9;
-    }
     .output {
       margin: 6px 0 16px;
       white-space: pre-line;
     }
-    .cursor {
-      display: inline-block;
-      width: 10px;
-      background: #c9d1d9;
-      animation: blink 1s infinite;
-    }
-    @keyframes blink {
-      50% { opacity: 0; }
+    input {
+      background: transparent;
+      border: none;
+      color: #c9d1d9;
+      font-family: inherit;
+      font-size: 16px;
+      outline: none;
+      width: 90%;
     }
     .light {
       background: #f6f8fa;
@@ -42,6 +38,9 @@
     }
     .light .prompt {
       color: #0969da;
+    }
+    .light input {
+      color: #24292f;
     }
   </style>
 </head>
@@ -53,14 +52,15 @@ Welcome to Vũ Kiều Phương's portfolio
 Type 'help' to see available commands
     </div>
 
-    <div>
+    <div class="input-line">
       <span class="prompt">$</span>
-      <span class="cursor"></span>
+      <input type="text" id="commandInput" autofocus />
     </div>
   </div>
 
   <script>
     const terminal = document.getElementById("terminal");
+    const input = document.getElementById("commandInput");
 
     const commands = {
       help: `
@@ -74,7 +74,6 @@ Available commands:
 - clear      : Clear terminal
 - theme      : Toggle light/dark mode
       `,
-
       about: `
 Name         : Vu Kieu Phuong (Lucci)
 Year of birth: 2002
@@ -87,7 +86,6 @@ Background:
 Current role:
 - Junior Project Manager at an engineering company
       `,
-
       experience: `
 - Junior Project Manager
   Yamaguchi Vietnam JSC
@@ -95,20 +93,17 @@ Current role:
 - Business Development Intern
   FPT IS
       `,
-
       skills: `
 - Customer Insight
 - Research Skills
 - Analytical Skills
 - Project Management
       `,
-
       certs: `
 - Google Data Analytics (2024)
 - Business Analyst Foundation (2023)
 - IELTS 6.5 (2021)
       `,
-
       contact: `
 Email   : vukieuphuong98@gmail.com
 Phone   : 0818 880 768
@@ -119,12 +114,18 @@ Facebook: https://facebook.com/kieuphuong.vu.9802
 
     let isLight = false;
 
-    document.addEventListener("keydown", function (e) {
+    input.addEventListener("keydown", function (e) {
       if (e.key === "Enter") {
-        const input = prompt("Enter command:");
-        if (!input) return;
+        const cmd = input.value.trim().toLowerCase();
+        if (!cmd) return;
 
-        const cmd = input.trim().toLowerCase();
+        const commandBlock = document.createElement("div");
+        commandBlock.innerHTML = `
+          <div>
+            <span class="prompt">$</span> ${cmd}
+          </div>
+        `;
+        terminal.insertBefore(commandBlock, input.parentElement);
 
         if (cmd === "clear") {
           terminal.innerHTML = `
@@ -133,31 +134,31 @@ Welcome to Vũ Kiều Phương's portfolio
 
 Type 'help' to see available commands
             </div>
-            <div>
+            <div class="input-line">
               <span class="prompt">$</span>
-              <span class="cursor"></span>
+              <input type="text" id="commandInput" autofocus />
             </div>
           `;
+          location.reload();
           return;
         }
 
         if (cmd === "theme") {
           isLight = !isLight;
           document.body.classList.toggle("light");
+          input.value = "";
           return;
         }
 
         const output = commands[cmd] || "Command not found. Type 'help'.";
 
-        const block = document.createElement("div");
-        block.innerHTML = `
-          <div>
-            <span class="prompt">$</span>
-            <span class="command">${cmd}</span>
-          </div>
-          <div class="output">${output}</div>
-        `;
-        terminal.insertBefore(block, terminal.lastElementChild);
+        const outputBlock = document.createElement("div");
+        outputBlock.className = "output";
+        outputBlock.textContent = output;
+
+        terminal.insertBefore(outputBlock, input.parentElement);
+
+        input.value = "";
         window.scrollTo(0, document.body.scrollHeight);
       }
     });
